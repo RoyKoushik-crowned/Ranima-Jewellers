@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-sans: "Inter", Arial, sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: #f6f1e7;
+  color: #171614;
+  font-family: var(--font-sans);
+}
+::selection { background: #d4af57; color: #171614; }
+
+@layer components {
+  .container-luxury {
+    @apply mx-auto w-full max-w-[1400px] px-5 sm:px-8 lg:px-12;
+  }
+  .eyebrow {
+    @apply text-[10px] font-semibold uppercase tracking-[0.28em] text-gold;
+  }
+  .serif {
+    font-family: var(--font-display);
+  }
+  .gold-line {
+    @apply h-px bg-gold/50;
+  }
+  .luxury-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-gold bg-gold px-6 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-ink transition hover:bg-transparent hover:text-gold;
+  }
+  .ghost-button {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink/25 px-6 py-3 text-xs font-semibold uppercase tracking-[0.14em] transition hover:border-gold hover:text-gold;
+  }
+  .card {
+    @apply rounded-sm border border-ink/10 bg-white/50;
+  }
+  .input {
+    @apply w-full rounded-sm border border-ink/15 bg-white/70 px-4 py-3 text-sm outline-none transition focus:border-gold;
+  }
+  .admin-input {
+    @apply w-full rounded-xl border border-ink/10 bg-white px-4 py-3 text-sm outline-none transition focus:border-gold;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

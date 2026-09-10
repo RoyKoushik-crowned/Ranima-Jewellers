@@ -1,0 +1,2 @@
+import Link from "next/link";
+export function AdminNav(){return <header className="border-b border-ink/10 bg-white"><div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-8"><Link href="/admin" className="serif text-xl tracking-[.15em]">RANIMA <span className="ml-2 text-[8px] font-sans tracking-[.3em] text-gold">ADMIN</span></Link><Link href="/" className="text-[10px] uppercase tracking-[.15em] text-ink/50">View site</Link></div></header>}
