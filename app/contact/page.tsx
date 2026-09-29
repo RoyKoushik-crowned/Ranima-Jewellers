@@ -1,0 +1,7 @@
+import Link from "next/link";
+import { MapPin, Phone, Mail } from "lucide-react";
+export default function ContactPage() {
+  const phone = process.env.NEXT_PUBLIC_STORE_PHONE || "919999999999";
+  const email = process.env.NEXT_PUBLIC_STORE_EMAIL || "hello@rmjewelers.com";
+  return <main><header className="bg-ink text-ivory"><nav className="container-luxury flex items-center justify-between py-6"><Link href="/" className="serif text-2xl tracking-[.18em]">RANIMA <span className="block text-center text-[9px] font-sans tracking-[.42em] text-gold">JEWELLERS</span></Link><Link href="/" className="text-xs uppercase tracking-[.15em]">Home</Link></nav></header><section className="container-luxury py-20"><p className="eyebrow">Visit us</p><h1 className="serif mt-4 text-7xl">Ranima Jewellers</h1><div className="mt-12 grid gap-5 md:grid-cols-3"><div className="card p-7"><MapPin className="text-gold" size={24}/><h2 className="serif mt-5 text-3xl">Guwahati</h2><p className="mt-2 text-sm text-ink/55">Exact store address will be added before launch.</p></div><div className="card p-7"><Phone className="text-gold" size={24}/><h2 className="serif mt-5 text-3xl">Call</h2><a className="mt-2 block text-sm text-ink/55" href={`tel:+${phone}`}>+{phone}</a></div><div className="card p-7"><Mail className="text-gold" size={24}/><h2 className="serif mt-5 text-3xl">Email</h2><a className="mt-2 block text-sm text-ink/55" href={`mailto:${email}`}>{email}</a></div></div></section></main>;
+}
