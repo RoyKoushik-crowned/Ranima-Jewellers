@@ -49,7 +49,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             ) : <div className="mt-8 border-y border-ink/10 py-8"><p className="serif text-4xl">Price on enquiry</p><p className="mt-2 text-xs text-ink/50">Our team will confirm the current 925 silver price.</p></div>}
             <div className="mt-7 grid gap-3">
               <WhatsAppButton message={message}/>
-              {product.modification_available && <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919999999999"}?text=${encodeURIComponent(`Hi Ranima Jewellers, can ${product.name} be modified? Current size: ${product.size || "N/A"}.`)}`} target="_blank" rel="noreferrer" className="ghost-button w-full">Ask about size modification</a>}
+              {product.modification_available && <a href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "917896273923"}?text=${encodeURIComponent(`Hi Ranima Jewellers, can ${product.name} be modified? Current size: ${product.size || "N/A"}.`)}`} target="_blank" rel="noreferrer" className="ghost-button w-full">Ask about size modification</a>}
             </div>
             <div className="mt-8 grid gap-4 border-t border-ink/10 pt-7 sm:grid-cols-2">
               <Info label="Weight" value={product.gold_weight ? `${product.gold_weight}g` : "On enquiry"}/>
