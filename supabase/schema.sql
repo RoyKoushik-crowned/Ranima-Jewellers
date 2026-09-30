@@ -72,8 +72,8 @@ create table if not exists public.metal_rates (
 create table if not exists public.pricing_settings (
   id uuid primary key default gen_random_uuid(),
   gold_making_percentage numeric(7,5) not null default 0.10,
-  lightweight_threshold numeric(7,3) not null default 1.5,
-  lightweight_fixed_making numeric(12,2) not null default 1400,
+  lightweight_threshold numeric(7,3) not null default 1.0,
+  lightweight_making_percentage numeric(5,4) not null default 0.10,
   gold_gst_percentage numeric(7,5) not null default 0.03,
   making_gst_percentage numeric(7,5) not null default 0.03,
   active_from timestamptz not null default now(),
@@ -183,9 +183,9 @@ on conflict (slug) do nothing;
 insert into public.pricing_settings (
   gold_making_percentage,
   lightweight_threshold,
-  lightweight_fixed_making,
+  lightweight_making_percentage,
   gold_gst_percentage,
   making_gst_percentage
 )
-select 0.10, 1.5, 1400, 0.03, 0.03
+select 0.10, 1.0, 0.10, 0.03, 0.03
 where not exists (select 1 from public.pricing_settings);

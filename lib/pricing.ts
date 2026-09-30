@@ -9,10 +9,10 @@ export type PricingResult = {
 
 export const DEFAULT_PRICING_SETTINGS = {
   makingPercentage: 0.10,
-  lightweightThreshold: 1.5,
-  lightweightMaking: 1400,
+  lightweightThreshold: 1.0,
+  lightweightMakingPercentage: 0.10,
   goldGstPercentage: 0.03,
-  makingGstPercentage: 0.03
+  makingGstPercentage: 0.03,
 };
 
 export function calculateGoldPrice(
@@ -22,14 +22,21 @@ export function calculateGoldPrice(
   settings = DEFAULT_PRICING_SETTINGS
 ): PricingResult {
   const goldValue = goldWeight * goldRatePerGram;
+
   const makingCharge =
     goldWeight >= settings.lightweightThreshold
       ? goldValue * settings.makingPercentage
-      : settings.lightweightMaking;
+      : goldRatePerGram * settings.lightweightMakingPercentage;
 
   const goldGst = goldValue * settings.goldGstPercentage;
   const makingGst = makingCharge * settings.makingGstPercentage;
-  const finalPrice = goldValue + makingCharge + goldGst + makingGst + additionalCharges;
+
+  const finalPrice =
+    goldValue +
+    makingCharge +
+    goldGst +
+    makingGst +
+    additionalCharges;
 
   return {
     goldValue,
@@ -37,6 +44,6 @@ export function calculateGoldPrice(
     goldGst,
     makingGst,
     additionalCharges,
-    finalPrice
+    finalPrice,
   };
 }

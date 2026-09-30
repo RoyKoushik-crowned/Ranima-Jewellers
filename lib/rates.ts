@@ -1,33 +1,49 @@
-/**
- * V1 demo adapter.
- * Replace getCurrentGoldRate() with the selected market-rate API once
- * GOLD_RATE_API_URL / GOLD_RATE_API_KEY are configured.
- *
- * Do not expose provider keys to the browser.
- */
-
-const DEMO_22K_RATE = 6125;
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function getCurrentGoldRate(): Promise<number> {
-  const url = process.env.GOLD_RATE_API_URL;
-  const key = process.env.GOLD_RATE_API_KEY;
+  const supabase = await createSupabaseServerClient();
 
-  if (!url) return DEMO_22K_RATE;
+  const { data, error } = await supabase
+    .from("metal_rates")
+    .select("rate_per_gram")
+    .eq("metal", "gold")
+    .eq("purity", "22K")
+    .order("effective_at", { ascending: false })
+    .limit(1);
 
-  try {
-    const response = await fetch(url, {
-      headers: key ? { Authorization: `Bearer ${key}` } : undefined,
-      next: { revalidate: 300 }
-    });
-
-    if (!response.ok) throw new Error(`Rate provider returned ${response.status}`);
-    const data = await response.json();
-
-    // Adapt this mapping to the selected provider.
-    const rate = Number(data?.gold_22k_inr_per_gram ?? data?.gold_22k ?? data?.rate);
-    if (!Number.isFinite(rate) || rate <= 0) throw new Error("Invalid rate");
-    return rate;
-  } catch {
-    return DEMO_22K_RATE;
+  if (error) {
+    throw new Error(`Unable to fetch 22K gold rate: ${error.message}`);
   }
+
+  const rate = Number(data?.[0]?.rate_per_gram);
+
+  if (!Number.isFinite(rate) || rate <= 0) {
+    throw new Error("No valid 22K gold rate is available.");
+  }
+
+  return rate;
+}
+
+export async function getCurrentSilverRate(): Promise<number> {
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("metal_rates")
+    .select("rate_per_gram")
+    .eq("metal", "silver")
+    .eq("purity", "925")
+    .order("effective_at", { ascending: false })
+    .limit(1);
+
+  if (error) {
+    throw new Error(`Unable to fetch 925 silver rate: ${error.message}`);
+  }
+
+  const rate = Number(data?.[0]?.rate_per_gram);
+
+  if (!Number.isFinite(rate) || rate <= 0) {
+    throw new Error("No valid 925 silver rate is available.");
+  }
+
+  return rate;
 }
