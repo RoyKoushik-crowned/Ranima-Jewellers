@@ -127,44 +127,157 @@ alter table public.price_snapshots enable row level security;
 alter table public.audit_logs enable row level security;
 alter table public.admin_users enable row level security;
 
-create policy "public can read active categories"
-on public.categories for select using (active = true);
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $function$
+  select exists (
+    select 1
+    from public.admin_users
+    where id = auth.uid()
+      and role in ('owner', 'admin')
+  );
+$function$;
 
-create policy "public can read non archived products"
-on public.products for select using (archived = false);
+revoke execute
+on function public.is_admin()
+from public;
 
-create policy "public can read product images"
-on public.product_images for select using (true);
+grant execute
+on function public.is_admin()
+to authenticated;
 
-create policy "public can read rates"
-on public.metal_rates for select using (true);
+create policy "Public can read active categories"
+on public.categories
+for select
+to anon, authenticated
+using (active = true);
 
-create policy "public can read current pricing settings"
-on public.pricing_settings for select using (true);
+create policy "Public can read non archived products"
+on public.products
+for select
+to anon, authenticated
+using (archived = false);
 
-create policy "authenticated can manage categories"
-on public.categories for all to authenticated using (true) with check (true);
+create policy "Public can read product images"
+on public.product_images
+for select
+to anon, authenticated
+using (true);
 
-create policy "authenticated can manage products"
-on public.products for all to authenticated using (true) with check (true);
+create policy "Public can read metal rates"
+on public.metal_rates
+for select
+to anon, authenticated
+using (true);
 
-create policy "authenticated can manage images"
-on public.product_images for all to authenticated using (true) with check (true);
+create policy "Public can read pricing settings"
+on public.pricing_settings
+for select
+to anon, authenticated
+using (true);
 
-create policy "authenticated can manage rates"
-on public.metal_rates for all to authenticated using (true) with check (true);
 
-create policy "authenticated can manage pricing settings"
-on public.pricing_settings for all to authenticated using (true) with check (true);
+create policy "Admins can manage categories"
+on public.categories
+for all
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
 
-create policy "authenticated can manage snapshots"
-on public.price_snapshots for all to authenticated using (true) with check (true);
+create policy "Admins can manage products"
+on public.products
+for all
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
 
-create policy "authenticated can manage audit logs"
-on public.audit_logs for all to authenticated using (true) with check (true);
+create policy "Admins can manage product images"
+on public.product_images
+for all
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
 
-create policy "admins can read own admin profile"
-on public.admin_users for select to authenticated using (auth.uid() = id);
+create policy "Admins can manage metal rates"
+on public.metal_rates
+for all
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+create policy "Admins can manage pricing settings"
+on public.pricing_settings
+for all
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+create policy "Admins can manage price snapshots"
+on public.price_snapshots
+for all
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+
+create policy "Admins can read audit logs"
+on public.audit_logs
+for select
+to authenticated
+using (public.is_admin());
+
+create policy "Admins can insert audit logs"
+on public.audit_logs
+for insert
+to authenticated
+with check (public.is_admin());
+
+
+create policy "Admins can read own admin profile"
+on public.admin_users
+for select
+to authenticated
+using (auth.uid() = id);
+
+revoke all
+on public.categories,
+   public.products,
+   public.product_images,
+   public.metal_rates,
+   public.pricing_settings,
+   public.price_snapshots,
+   public.audit_logs,
+   public.admin_users
+from anon, authenticated;
+
+grant select
+on public.categories,
+   public.products,
+   public.product_images,
+   public.metal_rates,
+   public.pricing_settings
+to anon, authenticated;
+
+grant select, insert, update, delete
+on public.categories,
+   public.products,
+   public.product_images,
+   public.metal_rates,
+   public.pricing_settings,
+   public.price_snapshots
+to authenticated;
+
+grant select, insert
+on public.audit_logs
+to authenticated;
+
+grant select
+on public.admin_users
+to authenticated;
 
 -- Seed categories
 insert into public.categories (name, slug, sort_order) values

@@ -1,9 +1,10 @@
 import { ProductCard } from "@/components/ProductCard";
-import { sampleProducts } from "@/lib/demo-data";
 import { calculateGoldPrice } from "@/lib/pricing";
+import { getCurrentGoldRate } from "@/lib/rates";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { Search } from "lucide-react";
-
+import type { Product } from "@/lib/types";
 const categories = [
   "All",
   "Rings",
@@ -18,7 +19,6 @@ const categories = [
   "Coins",
 ];
 
-const DEMO_GOLD_RATE = 6125;
 
 type SearchParams = {
   category?: string;
@@ -39,7 +39,95 @@ export default async function JewelleryPage({
   const weightFilter = params.weight || "all";
   const availabilityFilter = params.availability || "all";
 
-  let products = sampleProducts.filter(
+  const supabase = await createSupabaseServerClient();
+
+  const { data, error } = await supabase
+    .from("products")
+    .select(`
+      id,
+      name,
+      slug,
+      description,
+      metal,
+      purity,
+      gold_weight,
+      gross_weight,
+      stone_weight,
+      stone_unit,
+      stone_type,
+      size,
+      huid,
+      hallmark_status,
+      modification_available,
+      availability,
+      featured,
+      additional_charges,
+      category_id,
+      categories (
+        name
+      ),
+      product_images (
+        storage_path,
+        sort_order,
+        is_primary
+      )
+    `)
+    .eq("archived", false)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new Error(`Unable to load jewellery: ${error.message}`);
+  }
+
+  const goldRate = await getCurrentGoldRate();
+
+  let products: Product[] = (data ?? []).map((product) => {
+    const categoryData = Array.isArray(product.categories)
+      ? product.categories[0]
+      : product.categories;
+
+    const sortedImages = [...(product.product_images ?? [])].sort(
+      (a, b) => {
+        if (a.is_primary !== b.is_primary) {
+          return a.is_primary ? -1 : 1;
+        }
+
+        return a.sort_order - b.sort_order;
+      }
+    );
+
+    const images = sortedImages.map((image) => {
+      const { data: publicUrl } = supabase.storage
+        .from("product-images")
+        .getPublicUrl(image.storage_path);
+
+      return publicUrl.publicUrl;
+    });
+
+    return {
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      category: categoryData?.name ?? "Uncategorised",
+      description: product.description ?? "",
+      metal: product.metal,
+      purity: product.purity,
+      gold_weight: product.gold_weight,
+      gross_weight: product.gross_weight,
+      stone_weight: product.stone_weight,
+      stone_type: product.stone_type,
+      size: product.size,
+      huid: product.huid,
+      hallmark_status: product.hallmark_status ?? "",
+      modification_available: product.modification_available,
+      availability: product.availability,
+      featured: product.featured,
+      additional_charges: product.additional_charges,
+      images,
+    };
+  });
+
+  products = products.filter(
     (p) =>
       category === "all" ||
       p.category.toLowerCase() === category
@@ -52,7 +140,7 @@ export default async function JewelleryPage({
 
     const price = calculateGoldPrice(
       p.gold_weight,
-      DEMO_GOLD_RATE,
+      goldRate,
       p.additional_charges || 0
     ).finalPrice;
 
@@ -69,7 +157,6 @@ export default async function JewelleryPage({
         return true;
     }
   });
-
   products = products.filter((p) => {
     if (weightFilter === "all") return true;
     if (p.gold_weight == null) return false;
@@ -279,7 +366,7 @@ export default async function JewelleryPage({
 
         <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3">
           {products.map((p) => (
-            <ProductCard product={p} key={p.id} />
+<ProductCard product={p} goldRate={goldRate} key={p.id} />
           ))}
         </div>
 
