@@ -6,6 +6,7 @@ import {
   Plus,
   ArrowRight,
   ShieldCheck,
+  Calculator,
 } from "lucide-react";
 import AdminLogoutButton from "@/components/AdminLogoutButton";
 import { sampleProducts } from "@/lib/demo-data";
@@ -115,7 +116,21 @@ export default async function AdminDashboard() {
         </div>
 
         {/* Main actions */}
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+<Link
+  href="/admin/calculator"
+  className="rounded-2xl bg-white p-6 transition-transform hover:-translate-y-0.5"
+>
+  <Calculator className="h-6 w-6 text-gold" />
+
+  <h2 className="mt-8 font-serif text-3xl">
+    Price Calculator
+  </h2>
+
+  <p className="mt-2 text-sm text-ink/55">
+    Calculate gold value, making charges, GST and the final selling price.
+  </p>
+</Link>
 
           <Link
             href="/admin/products/new"
