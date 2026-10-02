@@ -7,6 +7,7 @@ import {
   ArrowRight,
   ShieldCheck,
   Calculator,
+  FileText,
 } from "lucide-react";
 import AdminLogoutButton from "@/components/AdminLogoutButton";
 import { sampleProducts } from "@/lib/demo-data";
@@ -129,6 +130,20 @@ export default async function AdminDashboard() {
 
   <p className="mt-2 text-sm text-ink/55">
     Calculate gold value, making charges, GST and the final selling price.
+  </p>
+</Link>
+<Link
+  href="/admin/gst-bill"
+  className="rounded-2xl bg-white p-6 transition-transform hover:-translate-y-0.5"
+>
+  <FileText className="h-6 w-6 text-gold" />
+
+  <h2 className="mt-8 font-serif text-3xl">
+    GST Bill
+  </h2>
+
+  <p className="mt-2 text-sm text-ink/55">
+    Create and print a basic GST invoice with CGST, SGST and round off.
   </p>
 </Link>
 
