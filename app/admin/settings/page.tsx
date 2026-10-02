@@ -8,7 +8,7 @@ type PricingSettings = {
   id: string;
   gold_making_percentage: number;
   lightweight_threshold: number;
-  lightweight_making_percentage: number;
+  lightweight_making_charge: number;
   gold_gst_percentage: number;
   making_gst_percentage: number;
 };
@@ -19,7 +19,7 @@ export default function Settings() {
   const [settingsId, setSettingsId] = useState("");
   const [goldMaking, setGoldMaking] = useState("10");
   const [lightweightThreshold, setLightweightThreshold] = useState("1.0");
-  const [lightweightMaking, setLightweightMaking] = useState("10");
+  const [lightweightMaking, setLightweightMaking] = useState("1500");
   const [goldGst, setGoldGst] = useState("3");
   const [makingGst, setMakingGst] = useState("3");
 
@@ -36,7 +36,7 @@ export default function Settings() {
       const { data, error } = await supabase
         .from("pricing_settings")
         .select(
-          "id, gold_making_percentage, lightweight_threshold, lightweight_making_percentage, gold_gst_percentage, making_gst_percentage"
+          "id, gold_making_percentage, lightweight_threshold, lightweight_making_charge, gold_gst_percentage, making_gst_percentage"
         )
         .order("active_from", { ascending: false })
         .limit(1)
@@ -55,8 +55,8 @@ export default function Settings() {
         setGoldMaking(String(settings.gold_making_percentage * 100));
         setLightweightThreshold(String(settings.lightweight_threshold));
         setLightweightMaking(
-          String(settings.lightweight_making_percentage * 100)
-        );
+  String(settings.lightweight_making_charge)
+);
         setGoldGst(String(settings.gold_gst_percentage * 100));
         setMakingGst(String(settings.making_gst_percentage * 100));
       }
@@ -123,7 +123,7 @@ export default function Settings() {
       .update({
         gold_making_percentage: goldMakingValue / 100,
         lightweight_threshold: thresholdValue,
-        lightweight_making_percentage: lightweightMakingValue / 100,
+        lightweight_making_charge: Number(lightweightMakingValue),
         gold_gst_percentage: goldGstValue / 100,
         making_gst_percentage: makingGstValue / 100,
         active_from: new Date().toISOString(),
@@ -175,10 +175,10 @@ export default function Settings() {
               />
 
               <Setting
-                label="Lightweight making percentage"
+                label="FIXED LIGHTWEIGHT MAKING CHARGE"
                 value={lightweightMaking}
-                suffix="%"
-                note="Fixed percentage of the current gold rate per gram for products below the threshold."
+                suffix="₹"
+                note="Fixed making charge applied to products below the lightweight threshold."
                 onChange={setLightweightMaking}
                 disabled={saving}
               />
